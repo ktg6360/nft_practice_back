@@ -52,22 +52,52 @@ app.get('/users', async (req, res) => {
 
 
 // 회원가입
-app.post('/signUp', async (req, res) => {
+app.post('/signUp', (req, res) => {
   fs.readFile('./database/users.json', (err, data) => {
     if (err) throw err;
     const users = JSON.parse(data);
+    const id = req.body.id;
+    const password = req.body.password;
     const newUser = {
-      "id": "Noah1234",
-      "name": "Noah",
-      "address": "abcdefghijklmnopqrstuvwxyz"
+      id,
+      password
     };
+
     users.push(newUser);
     fs.writeFile('./database/users.json', JSON.stringify(users), (err, result) => {
       if (err) throw err;
-      res.send('회원가입 성공');
+      res.json({
+        success: true,
+        msg: "회원가입 성공"
+      });
     });
   });
 });
+
+
+// 지갑 추가
+app.post('/createWallet', (req, res) => {
+  fs.readFile('./database/users.json', async (err, data) => {
+    if (err) throw err;
+    const users = JSON.parse(data);
+    const wallet = await caver.kas.wallet.createAccount();
+    const id = req.body.id;
+    users.forEach(user => {
+      if (user.id === id) {
+        user.wallet = wallet;
+      }
+    });
+
+    fs.writeFile('./database/users.json', JSON.stringify(users), (err, result) => {
+      if (err) throw err;
+      res.json({
+        success: true,
+        msg: "지갑추가 성공"
+      });
+    });
+  });
+});
+
 
 app.listen(port, () => {
   console.log('서버 구동중입니다!');

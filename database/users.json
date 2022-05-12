@@ -1,12 +1,15 @@
 [
 	{
-		"id": "Chaster1234",
-		"name": "Chaster",
-		"address": "0x04d445DCeD078e5Aacf2B698927c62Ae4f59bF12"
-	},
-	{
-		"id": "Noah1234",
-		"name": "Noah",
-		"address": "abcdefghijklmnopqrstuvwxyz"
+		"id": "chaster",
+		"password": "1q2w3e4r",
+		"wallet": {
+			"address": "0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91",
+			"chainId": 1001,
+			"createdAt": 1652347691,
+			"keyId": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default:0xb3d3b896c726830a708932784410c77d1b029f1d68ddb5046efc99f1c08cfac4",
+			"krn": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default",
+			"publicKey": "0x049dcb5847c62f4d90adc8567b4593247fad38409cb4724a85d923baca8db9eb2feed13f484c2153460b980512d0b19a7b8fa90e00181da7436f845482188b9c54",
+			"updatedAt": 1652347691
+		}
 	}
 ]
