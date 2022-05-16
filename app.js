@@ -92,7 +92,8 @@ app.post('/createWallet', (req, res) => {
       if (err) throw err;
       res.json({
         success: true,
-        msg: "지갑추가 성공"
+        msg: "지갑추가 성공",
+        wallet: wallet
       });
     });
   });
