@@ -10,11 +10,12 @@ const router = require('./router/routes');
 const CaverExtKas = require('caver-js-ext-kas');
 const caver = new CaverExtKas();
 
+const chainId = 1001;
 const accessKey = 'KASK4XAQZ0FNKT292VZSCJMZ';
 const secretKey = 'QVWQXYAVPK9A9W2Pbb6RZS8PoJJnPEO6KxyOIEdk';
 
 caver.initKASAPI(
-  1001,
+  chainId,
   accessKey,
   secretKey,
 );
@@ -34,7 +35,7 @@ app.get('/createAccount', async (req, res) => {
 
 // Klaytn 계정 조회
 app.get('/getAccount', async (req, res) => {
-  const result = await caver.kas.wallet.getAccount('0x04d445DCeD078e5Aacf2B698927c62Ae4f59bF12');
+  const result = await caver.kas.wallet.getAccount('0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A');
   console.log(result);
   res.send(result);
 });
@@ -45,7 +46,6 @@ app.get('/users', async (req, res) => {
   fs.readFile('./database/users.json', (err, data) => {
     if (err) throw err;
     const users = JSON.parse(data);
-    console.log(users);
     res.send(users);
   });
 });
@@ -99,6 +99,18 @@ app.post('/createWallet', (req, res) => {
   });
 });
 
+
+// balance 조회
+app.get('/getBalance', async (req, res) => {
+  const address = req.query.address;
+  const peb = await caver.klay.getBalance(address);
+  const balance = caver.utils.fromPeb(peb, 'KLAY');
+  res.json({
+    success: true,
+    msg: "Balace 조회 성공",
+    balance: balance
+  });
+});
 
 app.listen(port, () => {
   console.log('서버 구동중입니다!');
