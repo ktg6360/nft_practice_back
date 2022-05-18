@@ -12,8 +12,8 @@ const caver = new CaverExtKas();
 
 // chain-id: 8217 or 1001 => Cypress(Klaytn 메인넷) 또는 Baobab(Klaytn 테스트넷)
 const chainId = 1001;
-const accessKey = 'KASK4XAQZ0FNKT292VZSCJMZ';
-const secretKey = 'QVWQXYAVPK9A9W2Pbb6RZS8PoJJnPEO6KxyOIEdk';
+const accessKey = process.env.ACCESSKEY;
+const secretKey = process.env.SECRETKEY;
 
 caver.initKASAPI(
   chainId,
