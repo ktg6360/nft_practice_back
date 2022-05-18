@@ -13,7 +13,7 @@
     }
   },
   {
-    "id": "brian1234",
+    "id": "brian",
     "password": "1234",
     "wallet": {
       "address": "0x4Aa5B0ABd965B93BC5F0B8Cc68f554055772aD48",
@@ -26,7 +26,7 @@
     }
   },
   {
-    "id": "banana1121",
+    "id": "banana",
     "password": "12345",
     "wallet": {
       "address": "0xd472c9Bc4c6709d078dB5EFf89261F506b1DbCBd",
@@ -39,7 +39,7 @@
     }
   },
   {
-    "id": "philip1234",
+    "id": "philip",
     "password": "1212",
     "wallet": {
       "address": "0xC5773474083b679948a7104c45FB2E920811747d",
@@ -52,7 +52,7 @@
     }
   },
   {
-    "id": "potato1999",
+    "id": "potato",
     "password": "123123",
     "wallet": {
       "address": "0x1878397126AC3897FF667f0195c3c476188Fa061",
@@ -75,6 +75,19 @@
       "krn": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default",
       "publicKey": "0x04bd989633cc559a3ae9b27a68baf1226fe5385b79b2f04692ec9569624863b50d8d0f0422d6bd3c7e089da3b2f43a932440219753355ad2c7be0dc39bd4bb7eaa",
       "updatedAt": 1652765543
+    }
+  },
+  {
+    "id": "coffee",
+    "password": "1234",
+    "wallet": {
+      "address": "0xCF2e6Aa7194006C3cd86518ceA93fB2de7Ef5747",
+      "chainId": 1001,
+      "createdAt": 1652857838,
+      "keyId": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default:0x785c5ab06098f77650af7a9c94ac1290a2f70cc2f44762faf1f635441b289a7e",
+      "krn": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default",
+      "publicKey": "0x04071cc51b509b7380f456403cfd862664c3d4f3893b6e1019152c54338363697c4f9415e204824952b620c46b93fedcd9884f737527854c75d174ad4b70cf6d62",
+      "updatedAt": 1652857838
     }
   }
 ]

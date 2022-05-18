@@ -10,6 +10,7 @@ const router = require('./router/routes');
 const CaverExtKas = require('caver-js-ext-kas');
 const caver = new CaverExtKas();
 
+// chain-id: 8217 or 1001 => Cypress(Klaytn 메인넷) 또는 Baobab(Klaytn 테스트넷)
 const chainId = 1001;
 const accessKey = 'KASK4XAQZ0FNKT292VZSCJMZ';
 const secretKey = 'QVWQXYAVPK9A9W2Pbb6RZS8PoJJnPEO6KxyOIEdk';
@@ -111,6 +112,47 @@ app.get('/getBalance', async (req, res) => {
     balance: balance
   });
 });
+
+
+// 클레이 전송하기
+app.post('/sendKlay', async (req, res) => {
+  const from = req.body.fromAddress;
+  const to = req.body.toAddress;
+  const value = req.body.amount;
+
+  // 클레이를 전송할 계정 잔고 확인
+  const peb = await caver.klay.getBalance(from);
+  const balance = caver.utils.fromPeb(peb, 'KLAY');
+  console.log('balance: ', balance);
+  console.log('value: ', value);
+
+  const tx = {
+    from: from,
+    to: to,
+    value: caver.utils.toPeb(value, 'KLAY'),
+    gas: 25000,
+    memo: 'memo',
+    submit: true
+  };
+
+  try {
+    const result = await caver.kas.wallet.requestValueTransfer(tx);
+
+    res.json({
+      success: true,
+      msg: '전송 성공!',
+      transaction: result
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.json({
+      success: false,
+      msg: '금액이 초과했거나 존재하지 않는 계정입니다. 다시 확인해주세요.'
+    });
+  }
+});
+
 
 app.listen(port, () => {
   console.log('서버 구동중입니다!');

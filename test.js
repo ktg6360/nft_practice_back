@@ -56,13 +56,12 @@ app.get('/existAccount', async (req, res) => {
 
 // 클레이 전송하기
 app.post('/sendKlay', async (req, res) => {
-  // 전송받을 계정
+  const from = req.body.fromAddress;
   const to = req.body.toAddress;
-  // 전송할 클레이 양
   const value = req.body.amount;
 
   // 클레이를 전송할 계정 잔고 확인
-  const peb = await caver.klay.getBalance(process.env.ADDRESS);
+  const peb = await caver.klay.getBalance(from);
   const balance = caver.utils.fromPeb(peb, 'KLAY');
   console.log('balance: ', balance);
   console.log('value: ', value);
@@ -84,10 +83,17 @@ app.post('/sendKlay', async (req, res) => {
 
     const receipt = await caver.rpc.klay.sendRawTransaction(signed);
     console.log('receipt: ', receipt);
-    res.send(receipt);
+    res.json({
+      success: true,
+      msg: '전송 성공!',
+      receipt: receipt
+    });
 
   } else {
-    res.status(400).send('금액이 초과했거나 존재하지 않는 계정입니다. 다시 확인해주세요!');
+    res.status(400).send({
+      success: false,
+      msg: '금액이 초과했거나 존재하지 않는 계정입니다. 다시 확인해주세요!'
+    });
   }
 });
 
