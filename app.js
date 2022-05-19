@@ -42,12 +42,25 @@ app.get('/getAccount', async (req, res) => {
 });
 
 
-// user 정보 불러오기
+// users 정보 불러오기
 app.get('/users', async (req, res) => {
   fs.readFile('./database/users.json', (err, data) => {
     if (err) throw err;
     const users = JSON.parse(data);
     res.send(users);
+  });
+});
+
+
+// user 정보 불러오기
+app.get('/user', async (req, res) => {
+  const userId = req.query.userId;
+
+  fs.readFile('./database/users.json', (err, data) => {
+    if (err) throw err;
+    const users = JSON.parse(data);
+    const user = users.filter(user => user.id === userId);
+    res.send(user);
   });
 });
 
@@ -150,6 +163,56 @@ app.post('/sendKlay', async (req, res) => {
       success: false,
       msg: '금액이 초과했거나 존재하지 않는 계정입니다. 다시 확인해주세요.'
     });
+  }
+});
+
+
+// 컨트랙트 배포
+app.post('/deploy', async (req, res) => {
+  try {
+    const result = await caver.kas.kip17.deploy('cucumber KIP-17', 'BZZT', 'cucumber-bzznbyd-token');
+    res.json(result);
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// 컨트랙트 리스트
+app.get('/getContractList', async (req, res) => {
+  try {
+    const result = await caver.kas.kip17.getContractList();
+    res.json(result);
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// 토큰 발행(민팅)
+app.post('/mint', async (req, res) => {
+  try {
+    const mint = await caver.kas.kip17.mint('cucumber-bzznbyd-token', '0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A', '0x1', 'ipfs://QmZvscF7Ntt2wgxn2NUdzwp3XGpFkXYdEAS22pJBL1Krec/3.json');
+    res.json(mint);
+    console.log('mint: ', mint);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// 토큰 리스트
+app.get('/getTokenList', async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    console.log(userId);
+    const result = await caver.kas.kip17.getTokenList(`${userId}-bzznbyd-token`);
+    console.log(result.items);
+    res.json(result.items);
+  } catch (error) {
+    console.error(error);
   }
 });
 
