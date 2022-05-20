@@ -168,11 +168,17 @@ app.post('/sendKlay', async (req, res) => {
 
 
 // 컨트랙트 배포
-app.post('/deploy', async (req, res) => {
+app.post('/deployContract', async (req, res) => {
   try {
-    const result = await caver.kas.kip17.deploy('cucumber KIP-17', 'BZZT', 'cucumber-bzznbyd-token');
-    res.json(result);
-    console.log(result);
+    const userId = req.body.userId;
+    console.log(userId);
+    const deploy = await caver.kas.kip17.deploy(`${userId} KIP-17`, 'BZZT', `${userId}-bzznbyd-token`);
+    res.json({
+      success: true,
+      msg: '저장소 만들기 성공!',
+      deploy: deploy
+    });
+    console.log(deploy);
   } catch (error) {
     console.error(error);
   }
@@ -194,8 +200,14 @@ app.get('/getContractList', async (req, res) => {
 // 토큰 발행(민팅)
 app.post('/mint', async (req, res) => {
   try {
-    const mint = await caver.kas.kip17.mint('cucumber-bzznbyd-token', '0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A', '0x1', 'ipfs://QmZvscF7Ntt2wgxn2NUdzwp3XGpFkXYdEAS22pJBL1Krec/3.json');
-    res.json(mint);
+    const userId = req.body.userId
+    const randomNum = Math.floor(Math.random() * 10) + 1;
+    const mint = await caver.kas.kip17.mint(`${userId}-bzznbyd-token`, '0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A', '0x1', `ipfs://QmZvscF7Ntt2wgxn2NUdzwp3XGpFkXYdEAS22pJBL1Krec/${randomNum}.json`);
+    res.json({
+      success: true,
+      msg: '민팅 성공! 바로 내 NFT를 보러 가시겠습니까?',
+      mint: mint
+    });
     console.log('mint: ', mint);
   } catch (error) {
     console.error(error);
@@ -207,7 +219,7 @@ app.post('/mint', async (req, res) => {
 app.get('/getTokenList', async (req, res) => {
   try {
     const userId = req.query.userId;
-    console.log(userId);
+    // const userId = 'cucumber';
     const result = await caver.kas.kip17.getTokenList(`${userId}-bzznbyd-token`);
     console.log(result.items);
     res.json(result.items);
@@ -215,6 +227,22 @@ app.get('/getTokenList', async (req, res) => {
     console.error(error);
   }
 });
+
+
+// blockNumber 로 block 불러오기
+app.get('/getBlock', (req, res) => {
+  caver.klay.getBlock(91380036).then(console.log);
+  res.send('block 가져오기 성공!');
+});
+
+
+// getTransactionByHash
+app.get('/getTransactionByHash', async(req, res) => {
+  const result = await caver.rpc.klay.getTransactionByHash('0x95007d56b877181891902e7ffa92a29f74038109d42e58edb504abf88a2c9646');
+  console.log(result);
+  res.json(result);
+})
+
 
 
 app.listen(port, () => {
