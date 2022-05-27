@@ -180,5 +180,18 @@
       "publicKey": "0x04e4315c399a3ce980e8eb71ce53057fa7765aa4428022185f180f50d1ffe349e560a14237b3f612644cdfef4ee4daacad60cb2891071a32be5ff16fdacd9f6fa9",
       "updatedAt": 1653038415
     }
+  },
+  {
+    "id": "brian",
+    "password": "1q2w3e4r",
+    "wallet": {
+      "address": "0x32Ef6C3ceAacC3eD99c9d050aB65FFE19EC91A04",
+      "chainId": 1001,
+      "createdAt": 1653298255,
+      "keyId": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default:0xe6a24713bb98a2bccd711aa6a1084700d57c14f2a4ca1a4faf26ff5402d20463",
+      "krn": "krn:1001:wallet:07ee4a9e-7e09-428e-a0f1-0a293fdbc4f6:account-pool:default",
+      "publicKey": "0x04a04b9c6bd0567bba6c3a260fd25fd7b392ff3acf003480acf6968252fc07fd9f954fb1218b7904a2d3df71746f4b0d7b5b43585e246f067c71c60c684054e71f",
+      "updatedAt": 1653298255
+    }
   }
 ]

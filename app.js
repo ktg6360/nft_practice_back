@@ -170,9 +170,9 @@ app.post('/sendKlay', async (req, res) => {
 // 컨트랙트 배포
 app.post('/deployContract', async (req, res) => {
   try {
-    const userId = req.body.userId;
-    console.log(userId);
-    const deploy = await caver.kas.kip17.deploy(`${userId} KIP-17`, 'BZZT', `${userId}-bzznbyd-token`);
+    // const userId = req.body.userId;
+    // console.log(userId);
+    const deploy = await caver.kas.kip17.deploy(`Bzznbyd NFT`, 'BZZB', `bzznbyd-nft`);
     res.json({
       success: true,
       msg: '저장소 만들기 성공!',
@@ -200,15 +200,22 @@ app.get('/getContractList', async (req, res) => {
 // 토큰 발행(민팅)
 app.post('/mint', async (req, res) => {
   try {
-    const userId = req.body.userId
-    const randomNum = Math.floor(Math.random() * 10) + 1;
-    const mint = await caver.kas.kip17.mint(`${userId}-bzznbyd-token`, '0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A', '0x1', `ipfs://QmZvscF7Ntt2wgxn2NUdzwp3XGpFkXYdEAS22pJBL1Krec/${randomNum}.json`);
+    const tokenId = req.body.tokenId;
+    console.log(tokenId);
+    const num = Number(tokenId);
+    const tokenId16 = num.toString(16);
+    console.log(tokenId16);
+
+    // const userId = req.body.userId
+    // const randomNum = Math.floor(Math.random() * 10) + 1;
+    const mint = await caver.kas.kip17.mint(`bzznbyd-nft`, '0xBAdB0a506A85A7D2Bf837C3E09a8f944DFb61551', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
     res.json({
       success: true,
       msg: '민팅 성공! 바로 내 NFT를 보러 가시겠습니까?',
       mint: mint
     });
     console.log('mint: ', mint);
+
   } catch (error) {
     console.error(error);
   }
