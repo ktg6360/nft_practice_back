@@ -172,7 +172,7 @@ app.post('/deployContract', async (req, res) => {
   try {
     // const userId = req.body.userId;
     // console.log(userId);
-    const deploy = await caver.kas.kip17.deploy(`Bzznbyd NFT`, 'BZZB', `bzznbyd-nft`);
+    const deploy = await caver.kas.kip17.deploy(`Bzznbyd Birds Project`, 'BZBP', `bzznbyd-birds-project`);
     res.json({
       success: true,
       msg: '저장소 만들기 성공!',
@@ -208,10 +208,10 @@ app.post('/mint', async (req, res) => {
 
     // const userId = req.body.userId
     // const randomNum = Math.floor(Math.random() * 10) + 1;
-    const mint = await caver.kas.kip17.mint(`bzznbyd-nft`, '0xBAdB0a506A85A7D2Bf837C3E09a8f944DFb61551', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
+    const mint = await caver.kas.kip17.mint(`bzznbyd-birds-project`, '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
     res.json({
       success: true,
-      msg: '민팅 성공! 바로 내 NFT를 보러 가시겠습니까?',
+      msg: '민팅 성공!',
       mint: mint
     });
     console.log('mint: ', mint);
@@ -225,11 +225,11 @@ app.post('/mint', async (req, res) => {
 // 토큰 리스트
 app.get('/getTokenList', async (req, res) => {
   try {
-    const userId = req.query.userId;
+    // const userId = req.query.userId;
     // const userId = 'cucumber';
-    const result = await caver.kas.kip17.getTokenList(`${userId}-bzznbyd-token`);
-    console.log(result.items);
+    const result = await caver.kas.kip17.getTokenList(`bzznbyd-nft`);
     res.json(result.items);
+
   } catch (error) {
     console.error(error);
   }
@@ -244,12 +244,96 @@ app.get('/getBlock', (req, res) => {
 
 
 // getTransactionByHash
-app.get('/getTransactionByHash', async(req, res) => {
+app.get('/getTransactionByHash', async (req, res) => {
   const result = await caver.rpc.klay.getTransactionByHash('0x95007d56b877181891902e7ffa92a29f74038109d42e58edb504abf88a2c9646');
   console.log(result);
   res.json(result);
-})
+});
 
+
+//transfer
+app.post('/transfer', (req, res) => {
+  const userId = req.body.userId;
+  const tokenId = req.body.tokenId;
+  // const num = Number(tokenId);
+  const tokenId16 = tokenId.toString(16);
+
+  fs.readFile('./database/users.json', async (err, data) => {
+    if (err) throw err;
+    const users = JSON.parse(data);
+    const user = users.filter(user => user.id === userId);
+    const address = user[0].wallet.address;
+    
+    try {
+      const result = await caver.kas.kip17.transfer('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `${address}`, `0x${tokenId16}`);
+
+      console.log(result);
+      res.json({
+        success: true,
+        msg: '나에게로 전송 성공!',
+        result: result
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  });
+});
+
+
+//tempmint
+app.post('/tempmint', async (req, res) => {
+  try {
+    const mint = await caver.kas.kip17.mint(`bzznbyd-nft-temp`, '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x2`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/2.json`);
+    res.json({
+      success: true,
+      msg: '민팅 성공! 바로 내 NFT를 보러 가시겠습니까?',
+      mint: mint
+    });
+    console.log('mint: ', mint);
+
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+//temptransfer
+app.post('/temptransfer', async (req, res) => {
+  try {
+    const result = await caver.kas.kip17.transfer('bzznbyd-nft', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xBAdB0a506A85A7D2Bf837C3E09a8f944DFb61551', `0x1878397126AC3897FF667f0195c3c476188Fa061`, '0x1');
+
+    console.log(result);
+    res.json(result);
+
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// tempList
+app.get('/tempList', async (req, res) => {
+  try {
+    const result = await caver.kas.kip17.getTokenList(`bzznbyd-nft`);
+    res.json(result.items);
+
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+//getTransactionByHash
+app.get('/getTransactionByHash', async (req, res) => {
+  try {
+    const result = await caver.rpc.klay.getTransactionByHash('0x901164afc33274449ff006afeabf31de3530d62da6da9cc3703791db2881a553');
+    res.json(res);
+
+  } catch (error) {
+    console.error(error);
+  }
+})
 
 
 app.listen(port, () => {
