@@ -172,7 +172,7 @@ app.post('/deployContract', async (req, res) => {
   try {
     // const userId = req.body.userId;
     // console.log(userId);
-    const deploy = await caver.kas.kip17.deploy(`Bzznbyd Birds Project`, 'BZBP', `bzznbyd-birds-project`);
+    const deploy = await caver.kas.kip17.deploy('Bzznbyd Birds Project', 'BZBP', 'bzznbyd-birds-project');
     res.json({
       success: true,
       msg: '저장소 만들기 성공!',
@@ -208,7 +208,7 @@ app.post('/mint', async (req, res) => {
 
     // const userId = req.body.userId
     // const randomNum = Math.floor(Math.random() * 10) + 1;
-    const mint = await caver.kas.kip17.mint(`bzznbyd-birds-project`, '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
+    const mint = await caver.kas.kip17.mint('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
     res.json({
       success: true,
       msg: '민팅 성공!',
@@ -227,7 +227,7 @@ app.get('/getTokenList', async (req, res) => {
   try {
     // const userId = req.query.userId;
     // const userId = 'cucumber';
-    const result = await caver.kas.kip17.getTokenList(`bzznbyd-nft`);
+    const result = await caver.kas.kip17.getTokenList('bzznbyd-birds-project');
     res.json(result.items);
 
   } catch (error) {
@@ -244,11 +244,11 @@ app.get('/getBlock', (req, res) => {
 
 
 // getTransactionByHash
-app.get('/getTransactionByHash', async (req, res) => {
-  const result = await caver.rpc.klay.getTransactionByHash('0x95007d56b877181891902e7ffa92a29f74038109d42e58edb504abf88a2c9646');
-  console.log(result);
-  res.json(result);
-});
+// app.get('/getTransactionByHash', async (req, res) => {
+//   const result = await caver.rpc.klay.getTransactionByHash('0x95007d56b877181891902e7ffa92a29f74038109d42e58edb504abf88a2c9646');
+//   console.log(result);
+//   res.json(result);
+// });
 
 
 //transfer
@@ -263,7 +263,7 @@ app.post('/transfer', (req, res) => {
     const users = JSON.parse(data);
     const user = users.filter(user => user.id === userId);
     const address = user[0].wallet.address;
-    
+
     try {
       const result = await caver.kas.kip17.transfer('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `${address}`, `0x${tokenId16}`);
 
@@ -315,7 +315,7 @@ app.post('/temptransfer', async (req, res) => {
 // tempList
 app.get('/tempList', async (req, res) => {
   try {
-    const result = await caver.kas.kip17.getTokenList(`bzznbyd-nft`);
+    const result = await caver.kas.kip17.getTokenList(`bzznbyd-birds-project`);
     res.json(result.items);
 
   } catch (error) {
@@ -327,13 +327,60 @@ app.get('/tempList', async (req, res) => {
 //getTransactionByHash
 app.get('/getTransactionByHash', async (req, res) => {
   try {
-    const result = await caver.rpc.klay.getTransactionByHash('0x901164afc33274449ff006afeabf31de3530d62da6da9cc3703791db2881a553');
-    res.json(res);
+    const hash = req.query.hash;
+    console.log('hash: ', hash);
+    const result = await caver.rpc.klay.getTransactionByHash(hash);
+    res.json({
+      success: true,
+      msg: '가져오기 성공!',
+      result: result
+    });
 
   } catch (error) {
     console.error(error);
   }
-})
+});
+
+
+// 트랜잭션 추가
+app.post('/addHash', (req, res) => {
+  fs.readFile('./database/users.json', async (err, data) => {
+    if (err) throw err;
+    const users = JSON.parse(data);
+    const id = req.body.userId;
+    const hash = req.body.hash;
+    const tokenId = req.body.tokenId;
+    console.log('hash: ', hash);
+    console.log('tokenId: ', tokenId);
+    // const transaction = await caver.rpc.klay.getTransactionByHash(hash);
+
+    users.forEach(user => {
+      if (user.id === id) {
+        if (user.transactionHash) {
+          user.transactionHash.push({
+            hash,
+            tokenId
+          });
+        } else {
+          user.transactionHash = [{
+            hash,
+            tokenId
+          }];
+        }
+      }
+    });
+
+    fs.writeFile('./database/users.json', JSON.stringify(users), (err, result) => {
+      if (err) throw err;
+      res.json({
+        success: true,
+        msg: "트랜잭션 추가 성공"
+      });
+    });
+  });
+});
+
+
 
 
 app.listen(port, () => {
