@@ -9,6 +9,18 @@ const port = process.env.PORT;
 const router = require('./router/routes');
 const CaverExtKas = require('caver-js-ext-kas');
 const caver = new CaverExtKas();
+const pinataSDK = require('@pinata/sdk');
+const pinata = pinataSDK('3b2c0b7208dfcfc772ac', 'dc1a6f42edd2d79a3b98f8db2ee6d2db693e43233996f8db1829faf4f4ca7c21');
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'database/images'); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // cb 콜백함수를 통해 전송된 파일 이름 설정
+  }
+});
+const upload = multer({ storage: storage });
 
 // chain-id: 8217 or 1001 => Cypress(Klaytn 메인넷) 또는 Baobab(Klaytn 테스트넷)
 const chainId = 1001;
@@ -243,14 +255,6 @@ app.get('/getBlock', (req, res) => {
 });
 
 
-// getTransactionByHash
-// app.get('/getTransactionByHash', async (req, res) => {
-//   const result = await caver.rpc.klay.getTransactionByHash('0x95007d56b877181891902e7ffa92a29f74038109d42e58edb504abf88a2c9646');
-//   console.log(result);
-//   res.json(result);
-// });
-
-
 //transfer
 app.post('/transfer', (req, res) => {
   const userId = req.body.userId;
@@ -380,6 +384,126 @@ app.post('/addHash', (req, res) => {
   });
 });
 
+
+// 이미지 업로드
+app.post('/upload', upload.single('file'), async (req, res) => {
+  console.log(1111, req.file, req.body);
+  res.json({
+    success: true,
+    msg: '등록 성공!'
+  });
+});
+
+
+// 피나타
+app.post('/pinata', async (req, res) => {
+  const userId = req.body.userId;
+  const fileName = req.body.fileName;
+  console.log(userId);
+  console.log(fileName);
+
+  try {
+    const fs = require('fs');
+    const readableStreamForFile = fs.createReadStream(`database/images/${fileName}`);
+    const optionsForImage = {
+      pinataMetadata: {
+        name: `${userId}-nft-image`,
+        keyvalues: {
+          customKey: 'customValue',
+          customKey2: 'customValue2'
+        }
+      },
+      pinataOptions: {
+        cidVersion: 0
+      }
+    };
+
+    const result = await pinata.pinFileToIPFS(readableStreamForFile, optionsForImage);
+    console.log('imageToIPFS: ', result);
+
+    const name = `${userId} 버즈앤비 NFT`;
+    const description = "This is NFT made by Bzznbyd";
+    const ipfs = result.IpfsHash;
+    const date = Date.now();
+
+    const body = {
+      name: name,
+      description: description,
+      image: `ipfs://${ipfs}`,
+      date: date
+    };
+
+    const optionsForJson = {
+      pinataMetadata: {
+        name: `${userId}-nft-json`,
+        keyvalues: {
+          customKey: 'customValue',
+          customKey2: 'customValue2'
+        }
+      },
+      pinataOptions: {
+        cidVersion: 0
+      }
+    };
+
+    const resultForJson = await pinata.pinJSONToIPFS(body, optionsForJson);
+    console.log('jsonToIPFS', resultForJson);
+
+    res.json({
+      success: true,
+      msg: '메타데이터 생성 성공!',
+      result: resultForJson,
+      metaData: body
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// 나만의 컨트랙트 배포
+app.post('/deployMyContract', async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const deploy = await caver.kas.kip17.deploy(`Bzznbyd NFT ${userId}`, 'BZNU', `bzznbyd-nft-${userId}`);
+    res.json({
+      success: true,
+      msg: '저장소 만들기 성공!',
+      deploy: deploy
+    });
+    console.log(deploy);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+// 나만의 토큰 발행(민팅)
+app.post('/mintMyNFT', async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const ipfsHash = req.body.ipfsHash;
+
+    fs.readFile('./database/users.json', async (err, data) => {
+      if (err) throw err;
+      const users = JSON.parse(data);
+      const user = users.filter(user => user.id === userId);
+      const address = user[0].wallet.address;
+
+      const mint = await caver.kas.kip17.mint(`bzznbyd-nft-${userId}`, `${address}`, `0x1`, `ipfs://${ipfsHash}`);
+      res.json({
+        success: true,
+        msg: '민팅 성공!',
+        mint: mint
+      });
+      console.log('mint: ', mint);
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 
 
