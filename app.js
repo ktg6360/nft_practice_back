@@ -506,6 +506,45 @@ app.post('/mintMyNFT', async (req, res) => {
 });
 
 
+// myNFT 트랜잭션 추가
+app.post('/addMyNFTHash', (req, res) => {
+  fs.readFile('./database/users.json', async (err, data) => {
+    if (err) throw err;
+    const users = JSON.parse(data);
+    const id = req.body.userId;
+    const hash = req.body.hash;
+    const tokenId = req.body.tokenId;
+    console.log('hash: ', hash);
+    console.log('tokenId: ', tokenId);
+
+    users.forEach(user => {
+      if (user.id === id) {
+        if (user.transactionHashForMyNFT) {
+          user.transactionHashForMyNFT.push({
+            hash,
+            tokenId
+          });
+        } else {
+          user.transactionHashForMyNFT = [{
+            hash,
+            tokenId
+          }];
+        }
+      }
+    });
+
+    fs.writeFile('./database/users.json', JSON.stringify(users), (err, result) => {
+      if (err) throw err;
+      res.json({
+        success: true,
+        msg: "트랜잭션 추가 성공"
+      });
+    });
+  });
+});
+
+
+
 
 app.listen(port, () => {
   console.log('서버 구동중입니다!');
