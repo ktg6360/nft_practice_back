@@ -466,7 +466,8 @@ app.post('/pinata', async (req, res) => {
 app.post('/deployMyContract', async (req, res) => {
   try {
     const userId = req.body.userId;
-    const deploy = await caver.kas.kip17.deploy(`Bzznbyd NFT ${userId}`, 'BZNU', `bzznbyd-nft-${userId}`);
+    const userIdInLowerCase = userId.toLowerCase();
+    const deploy = await caver.kas.kip17.deploy(`Bzznbyd NFT ${userId}`, 'BZNU', `bzznbyd-nft-${userIdInLowerCase}`);
     res.json({
       success: true,
       msg: '저장소 만들기 성공!',
@@ -483,6 +484,7 @@ app.post('/deployMyContract', async (req, res) => {
 app.post('/mintMyNFT', async (req, res) => {
   try {
     const userId = req.body.userId;
+    const userIdInLowerCase = userId.toLowerCase();
     const ipfsHash = req.body.ipfsHash;
 
     fs.readFile('./database/users.json', async (err, data) => {
@@ -491,7 +493,7 @@ app.post('/mintMyNFT', async (req, res) => {
       const user = users.filter(user => user.id === userId);
       const address = user[0].wallet.address;
 
-      const mint = await caver.kas.kip17.mint(`bzznbyd-nft-${userId}`, `${address}`, `0x1`, `ipfs://${ipfsHash}`);
+      const mint = await caver.kas.kip17.mint(`bzznbyd-nft-${userIdInLowerCase}`, `${address}`, `0x1`, `ipfs://${ipfsHash}`);
       res.json({
         success: true,
         msg: '민팅 성공!',
