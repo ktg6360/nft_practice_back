@@ -41,7 +41,6 @@ app.use(express.urlencoded({ extended: false }));
 // Klaytn 계정 생성
 app.get('/createAccount', async (req, res) => {
   const result = await caver.kas.wallet.createAccount();
-  console.log(result);
   res.send(result);
 });
 
@@ -49,7 +48,6 @@ app.get('/createAccount', async (req, res) => {
 // Klaytn 계정 조회
 app.get('/getAccount', async (req, res) => {
   const result = await caver.kas.wallet.getAccount('0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A');
-  console.log(result);
   res.send(result);
 });
 
@@ -148,8 +146,6 @@ app.post('/sendKlay', async (req, res) => {
   // 클레이를 전송할 계정 잔고 확인
   const peb = await caver.klay.getBalance(from);
   const balance = caver.utils.fromPeb(peb, 'KLAY');
-  console.log('balance: ', balance);
-  console.log('value: ', value);
 
   const tx = {
     from: from,
@@ -182,15 +178,12 @@ app.post('/sendKlay', async (req, res) => {
 // 컨트랙트 배포
 app.post('/deployContract', async (req, res) => {
   try {
-    // const userId = req.body.userId;
-    // console.log(userId);
     const deploy = await caver.kas.kip17.deploy('Bzznbyd Birds Project', 'BZBP', 'bzznbyd-birds-project');
     res.json({
       success: true,
       msg: '저장소 만들기 성공!',
       deploy: deploy
     });
-    console.log(deploy);
   } catch (error) {
     console.error(error);
   }
@@ -202,7 +195,6 @@ app.get('/getContractList', async (req, res) => {
   try {
     const result = await caver.kas.kip17.getContractList();
     res.json(result);
-    console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -213,20 +205,14 @@ app.get('/getContractList', async (req, res) => {
 app.post('/mint', async (req, res) => {
   try {
     const tokenId = req.body.tokenId;
-    console.log(tokenId);
     const num = Number(tokenId);
     const tokenId16 = num.toString(16);
-    console.log(tokenId16);
-
-    // const userId = req.body.userId
-    // const randomNum = Math.floor(Math.random() * 10) + 1;
     const mint = await caver.kas.kip17.mint('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
     res.json({
       success: true,
       msg: '민팅 성공!',
       mint: mint
     });
-    console.log('mint: ', mint);
 
   } catch (error) {
     console.error(error);
@@ -237,8 +223,6 @@ app.post('/mint', async (req, res) => {
 // 토큰 리스트
 app.get('/getTokenList', async (req, res) => {
   try {
-    // const userId = req.query.userId;
-    // const userId = 'cucumber';
     const result = await caver.kas.kip17.getTokenList('bzznbyd-birds-project');
     res.json(result.items);
 
@@ -259,7 +243,6 @@ app.get('/getBlock', (req, res) => {
 app.post('/transfer', (req, res) => {
   const userId = req.body.userId;
   const tokenId = req.body.tokenId;
-  // const num = Number(tokenId);
   const tokenId16 = tokenId.toString(16);
 
   fs.readFile('./database/users.json', async (err, data) => {
@@ -271,7 +254,6 @@ app.post('/transfer', (req, res) => {
     try {
       const result = await caver.kas.kip17.transfer('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `${address}`, `0x${tokenId16}`);
 
-      console.log(result);
       res.json({
         success: true,
         msg: '나에게로 전송 성공!',
@@ -285,54 +267,10 @@ app.post('/transfer', (req, res) => {
 });
 
 
-//tempmint
-app.post('/tempmint', async (req, res) => {
-  try {
-    const mint = await caver.kas.kip17.mint(`bzznbyd-nft-temp`, '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x2`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/2.json`);
-    res.json({
-      success: true,
-      msg: '민팅 성공! 바로 내 NFT를 보러 가시겠습니까?',
-      mint: mint
-    });
-    console.log('mint: ', mint);
-
-  } catch (error) {
-    console.error(error);
-  }
-});
-
-
-//temptransfer
-app.post('/temptransfer', async (req, res) => {
-  try {
-    const result = await caver.kas.kip17.transfer('bzznbyd-nft', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xBAdB0a506A85A7D2Bf837C3E09a8f944DFb61551', `0x1878397126AC3897FF667f0195c3c476188Fa061`, '0x1');
-
-    console.log(result);
-    res.json(result);
-
-  } catch (error) {
-    console.error(error);
-  }
-});
-
-
-// tempList
-app.get('/tempList', async (req, res) => {
-  try {
-    const result = await caver.kas.kip17.getTokenList(`bzznbyd-birds-project`);
-    res.json(result.items);
-
-  } catch (error) {
-    console.error(error);
-  }
-});
-
-
 //getTransactionByHash
 app.get('/getTransactionByHash', async (req, res) => {
   try {
     const hash = req.query.hash;
-    console.log('hash: ', hash);
     const result = await caver.rpc.klay.getTransactionByHash(hash);
     res.json({
       success: true,
@@ -354,9 +292,6 @@ app.post('/addHash', (req, res) => {
     const id = req.body.userId;
     const hash = req.body.hash;
     const tokenId = req.body.tokenId;
-    console.log('hash: ', hash);
-    console.log('tokenId: ', tokenId);
-    // const transaction = await caver.rpc.klay.getTransactionByHash(hash);
 
     users.forEach(user => {
       if (user.id === id) {
@@ -399,8 +334,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 app.post('/pinata', async (req, res) => {
   const userId = req.body.userId;
   const fileName = req.body.fileName;
-  console.log(userId);
-  console.log(fileName);
 
   try {
     const fs = require('fs');
@@ -419,7 +352,6 @@ app.post('/pinata', async (req, res) => {
     };
 
     const result = await pinata.pinFileToIPFS(readableStreamForFile, optionsForImage);
-    console.log('imageToIPFS: ', result);
 
     const name = `${userId} 버즈앤비 NFT`;
     const description = "This is NFT made by Bzznbyd";
@@ -447,7 +379,6 @@ app.post('/pinata', async (req, res) => {
     };
 
     const resultForJson = await pinata.pinJSONToIPFS(body, optionsForJson);
-    console.log('jsonToIPFS', resultForJson);
 
     res.json({
       success: true,
@@ -473,7 +404,7 @@ app.post('/deployMyContract', async (req, res) => {
       msg: '저장소 만들기 성공!',
       deploy: deploy
     });
-    console.log(deploy);
+
   } catch (error) {
     console.error(error);
   }
@@ -499,7 +430,6 @@ app.post('/mintMyNFT', async (req, res) => {
         msg: '민팅 성공!',
         mint: mint
       });
-      console.log('mint: ', mint);
     });
 
   } catch (error) {
@@ -516,8 +446,6 @@ app.post('/addMyNFTHash', (req, res) => {
     const id = req.body.userId;
     const hash = req.body.hash;
     const tokenId = req.body.tokenId;
-    console.log('hash: ', hash);
-    console.log('tokenId: ', tokenId);
 
     users.forEach(user => {
       if (user.id === id) {
