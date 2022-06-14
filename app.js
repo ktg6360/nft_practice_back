@@ -10,7 +10,9 @@ const router = require('./router/routes');
 const CaverExtKas = require('caver-js-ext-kas');
 const caver = new CaverExtKas();
 const pinataSDK = require('@pinata/sdk');
-const pinata = pinataSDK('3b2c0b7208dfcfc772ac', 'dc1a6f42edd2d79a3b98f8db2ee6d2db693e43233996f8db1829faf4f4ca7c21');
+const pinataApiKey = process.env.PINATA_API_KEY;
+const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY;
+const pinata = pinataSDK(pinataApiKey, pinataSecretApiKey);
 const multer = require('multer');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -26,6 +28,7 @@ const upload = multer({ storage: storage });
 const chainId = 1001;
 const accessKey = process.env.ACCESSKEY;
 const secretKey = process.env.SECRETKEY;
+const myWalletAddress = '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91';
 
 caver.initKASAPI(
   chainId,
@@ -47,7 +50,7 @@ app.get('/createAccount', async (req, res) => {
 
 // Klaytn 계정 조회
 app.get('/getAccount', async (req, res) => {
-  const result = await caver.kas.wallet.getAccount('0x3F00dDAD226E05Bd53180942deE4919d0bba9a2A');
+  const result = await caver.kas.wallet.getAccount(myWalletAddress);
   res.send(result);
 });
 
@@ -207,7 +210,7 @@ app.post('/mint', async (req, res) => {
     const tokenId = req.body.tokenId;
     const num = Number(tokenId);
     const tokenId16 = num.toString(16);
-    const mint = await caver.kas.kip17.mint('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
+    const mint = await caver.kas.kip17.mint('bzznbyd-birds-project', myWalletAddress, `0x${tokenId16}`, `ipfs://QmYK7YaZ9Abw7XVBTKseqURuSZJa9Eh8hzZRNoyTYNRUzA/${tokenId}.json`);
     res.json({
       success: true,
       msg: '민팅 성공!',
@@ -252,7 +255,7 @@ app.post('/transfer', (req, res) => {
     const address = user[0].wallet.address;
 
     try {
-      const result = await caver.kas.kip17.transfer('bzznbyd-birds-project', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', '0xa8aDf8e26B64c249f97b55A4fD1267C12Bf87B91', `${address}`, `0x${tokenId16}`);
+      const result = await caver.kas.kip17.transfer('bzznbyd-birds-project', myWalletAddress, myWalletAddress, `${address}`, `0x${tokenId16}`);
 
       res.json({
         success: true,
